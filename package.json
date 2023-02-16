@@ -10,7 +10,9 @@
   },
   "dependencies": {
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "web-ifc-three": "^0.0.122",
+    "web-ifc-viewer": "^1.0.213"
   },
   "devDependencies": {
     "@types/react": "^18.0.27",
