@@ -15,7 +15,6 @@
     "react-dom": "^18.2.0",
     "react-map-gl": "^7.0.21",
     "three": "^0.149.0",
-    "web-ifc-three": "^0.0.122",
     "web-ifc-viewer": "^1.0.213"
   },
   "devDependencies": {
