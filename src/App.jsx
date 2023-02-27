@@ -1,28 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
 import maplibregl from "maplibre-gl";
 import { Map, Source, Layer, Popup } from "react-map-gl";
-import axios from "axios";
-import geoJsonData from "./api/geojson";
+import * as csv from "csvtojson";
 
 export default function App() {
   const [data, setData] = useState(null);
-  const [footprint, setFootprint] = useState(null);
   const [cursor, setCursor] = useState("auto");
   const [showPopup, setShowPopup] = useState(false);
   const [popUpCoordinate, setPopUpCoordinate] = useState({});
-  const [zoningInfo, setZoningInfo] = useState({});
-
-  useEffect(() => {
-    //   axios.get(geoJsonData.zoning).then((response) => {
-    //     const resp = response.data;
-    //     console.log(resp);
-    //     setData(resp);
-    //   });
-    //   axios.get(geoJsonData.buildingFootprints).then((response) => {
-    //     const resp = response.data;
-    //     setFootprint(resp);
-    //   });
-  }, []);
 
   const handleOnChange = (e) => {
     const file = e.target.files[0];
@@ -34,6 +19,30 @@ export default function App() {
       console.log(geoJsonObj);
       setData(geoJsonObj);
     };
+  };
+
+  const handleCsvUpload = (e) => {
+    const file = e;
+    csv()
+      .fromFile(file)
+      .then((jsonObj) => {
+        console.log(jsonObj);
+      });
+    // console.log(file);
+  };
+
+  const handleClick = (e) => {
+    setShowPopup(!showPopup);
+    setPopUpCoordinate({
+      lng: e.lngLat.lng,
+      lat: e.lngLat.lat,
+    });
+    console.log(e);
+  };
+
+  const popUpAttributes = {
+    longitude: popUpCoordinate.lng,
+    latitude: popUpCoordinate.lat,
   };
 
   const buildingStyle = {
@@ -61,11 +70,33 @@ export default function App() {
           console.log("Hovered");
         }}
         onMouseLeave={() => setCursor("auto")}
+        interactiveLayerIds={["buildings"]}
         cursor={cursor}
+        onClick={handleClick}
       >
         <Source type="geojson" data={data}>
           <Layer {...buildingStyle} />
         </Source>
+        {showPopup && (
+          <Popup {...popUpAttributes}>
+            {
+              <div>
+                <label
+                  className="cursor-pointer bg-teal-500 p-2 rounded-md text-white hover:bg-teal-700"
+                  htmlFor="inputTag"
+                >
+                  Upload a csv
+                  <input
+                    className="hidden"
+                    id="inputTag"
+                    type="file"
+                    onChange={handleCsvUpload}
+                  />
+                </label>
+              </div>
+            }
+          </Popup>
+        )}
       </Map>
     </div>
   );
