@@ -30,7 +30,9 @@ export default function App() {
     reader.readAsText(file);
     reader.onload = (event) => {
       const geoData = event.currentTarget.result;
-      console.log(geoData);
+      const geoJsonObj = JSON.parse(geoData);
+      console.log(geoJsonObj);
+      setData(geoJsonObj);
     };
   };
 
@@ -41,30 +43,6 @@ export default function App() {
       "fill-color": "#3a3a3a",
       "fill-opacity": 0.5,
     },
-  };
-
-  const footprintStyle = {
-    id: "footprint",
-    type: "fill",
-    paint: {
-      "fill-color": "red",
-    },
-  };
-
-  const handleClick = (event) => {
-    const featureObj = event.features;
-    const layerProperties = featureObj[0].properties;
-    setZoningInfo({
-      ...zoningInfo,
-      zoneCode: layerProperties.ZONE_CODE,
-      zoneMain: layerProperties.ZONE_MAIN,
-    });
-    setPopUpCoordinate({
-      ...popUpCoordinate,
-      longitude: event.lngLat.lng,
-      latitude: event.lngLat.lat,
-    });
-    setShowPopup(!showPopup);
   };
 
   return (
@@ -83,38 +61,11 @@ export default function App() {
           console.log("Hovered");
         }}
         onMouseLeave={() => setCursor("auto")}
-        onClick={handleClick}
-        interactiveLayerIds={["buildings"]}
         cursor={cursor}
       >
         <Source type="geojson" data={data}>
-          {/* <Layer
-            id="boundary"
-            type="line"
-            paint={{ "line-color": "#111", "line-width": 0.5 }}
-          /> */}
           <Layer {...buildingStyle} />
         </Source>
-        {/* <Source type="geojson" data={footprint}>
-          <Layer {...footprintStyle} />
-        </Source> */}
-        {showPopup && (
-          <Popup
-            longitude={popUpCoordinate.longitude}
-            latitude={popUpCoordinate.latitude}
-          >
-            <div className="grid grid-rows-1 grid-flow-col gap-2 text-lg p-4">
-              <ul className="text-right ">
-                <li>Zone:</li>
-                <li>Zone Code:</li>
-              </ul>
-              <ul className="text-orange-700">
-                <li>{zoningInfo.zoneMain}</li>
-                <li>{zoningInfo.zoneCode}</li>
-              </ul>
-            </div>
-          </Popup>
-        )}
       </Map>
     </div>
   );
