@@ -2,6 +2,8 @@ import { useRef, useState } from 'react';
 import { Source, Layer, Popup } from 'react-map-gl';
 import MapContainer from './components/MapContainer';
 import Csv from './components/Csv';
+// import polygon from '@turf/helpers';
+// import turf from '@turf/centroid';
 
 export default function App() {
   const [data, setData] = useState(null);
@@ -15,13 +17,18 @@ export default function App() {
     reader.readAsText(file);
     reader.onload = (event) => {
       const geoData = event.currentTarget.result;
+      // console.log(geoData);
       const geoJsonObj = JSON.parse(geoData);
       setData(geoJsonObj);
-
-      const buildingCoordinate =
-        geoJsonObj.features[0].geometry.coordinates[0][0][0].slice(0, 2);
-
-      mapRef.current.flyTo({ center: buildingCoordinate, zoom: 17 });
+      const feature = geoJsonObj.features[0].geometry.coordinates;
+      // console.dir(feature);
+      // const polygon = turf.polygon(feature);
+      // const centroid = turf.centroid(polygon);
+      // console.log(centroid);
+      // mapRef.current.flyTo({
+      //   center: [geoJsonProperties.Easting, geoJsonProperties.Northing],
+      //   zoom: 17,
+      // });
     };
   };
 
@@ -45,24 +52,40 @@ export default function App() {
     type: 'fill',
     paint: {
       'fill-color': '#3a3a3a',
-      'fill-opacity': 0.5,
+      'fill-opacity': 0,
+    },
+  };
+
+  const buildingHeight = {
+    id: 'building-height',
+    type: 'fill-extrusion',
+    paint: {
+      'fill-extrusion-color': '#3a3a3a',
+      'fill-extrusion-opacity': 0.7,
+      'fill-extrusion-height': ['get', 'Height'],
     },
   };
 
   return (
     <div className='absolute top-0 left-0 h-full w-full'>
-      <input type='file' onChange={handleGeojsonUpload} />
+      <nav>
+        <label className='fixed z-10 bg-emerald-500 hover:bg-emerald-700 text-white m-2 pr-2 pl-2 p-1 text-lg rounded-lg cursor-pointer'>
+          Upload a GeoJSON file
+          <input
+            className='hidden'
+            type='file'
+            onChange={handleGeojsonUpload}
+          />
+        </label>
+      </nav>
       <MapContainer handleClick={handleClick} ref={mapRef}>
         <Source type='geojson' data={data}>
           <Layer {...buildingStyle} />
+          <Layer {...buildingHeight} />
         </Source>
         {showPopup && (
           <Popup {...popUpAttributes}>
-            {
-              <div>
-                <Csv />
-              </div>
-            }
+            <Csv />
           </Popup>
         )}
       </MapContainer>

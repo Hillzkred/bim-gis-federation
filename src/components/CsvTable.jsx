@@ -2,25 +2,23 @@ function CsvTable({ properties, values, removeFile }) {
   return (
     <div className='pt-1'>
       <div className='p-1' />
-      <table className='border border-solid table-fixed w-full'>
-        <tr>
-          {properties.map((x) => {
-            return <th>{x}</th>;
+      <table className='border border-slate-500 border-separate table-fixed w-full text-center'>
+        <tr className='bg-emerald-200'>
+          {properties.map((x, index) => {
+            return (
+              <th className='border-slate-500' key={index}>
+                {x}
+              </th>
+            );
           })}
         </tr>
         <tr>
-          {values.map((x) => {
-            return <td>{x}</td>;
+          {values.map((x, index) => {
+            return <td key={index}>{x}</td>;
           })}
         </tr>
       </table>
       <div className='p-1' />
-      <button
-        className='p-1 bg-red-500 text-white rounded-sm'
-        {...removeFile()}
-      >
-        Remove
-      </button>
     </div>
   );
 }
