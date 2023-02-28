@@ -18,8 +18,7 @@
     "react-dom": "^18.2.0",
     "react-map-gl": "^7.0.21",
     "react-papaparse": "^4.1.0",
-    "three": "^0.149.0",
-    "web-ifc-viewer": "^1.0.213"
+    "three": "^0.149.0"
   },
   "devDependencies": {
     "@types/node": "^18.14.2",
