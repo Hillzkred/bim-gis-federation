@@ -1,8 +1,8 @@
 import maplibregl from 'maplibre-gl';
-import { useState } from 'react';
+import { forwardRef, useState } from 'react';
 import { Map } from 'react-map-gl';
 
-export default function MainMap({ children, handleClick }) {
+const MainMap = forwardRef(({ children, handleClick }, ref) => {
   const [cursor, setCursor] = useState('auto');
 
   return (
@@ -22,8 +22,10 @@ export default function MainMap({ children, handleClick }) {
       interactiveLayerIds={['buildings']}
       cursor={cursor}
       onClick={handleClick}
+      ref={ref}
     >
       {children}
     </Map>
   );
-}
+});
+export default MainMap;
