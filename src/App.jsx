@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import { Map, Source, Layer, Popup } from 'react-map-gl';
-import { readString, useCSVReader } from 'react-papaparse';
+import { useCSVReader } from 'react-papaparse';
+import CsvTable from './components/CsvTable';
 
 export default function App() {
   const [data, setData] = useState(null);
@@ -100,28 +101,11 @@ export default function App() {
                           />
                         </label>
                         {acceptedFile && (
-                          <div className='pt-1'>
-                            <div className='p-1' />
-                            <table className='border border-solid table-fixed w-full'>
-                              <tr>
-                                {csvProperties.map((x) => {
-                                  return <th>{x}</th>;
-                                })}
-                              </tr>
-                              <tr>
-                                {csvValues.map((x) => {
-                                  return <td>{x}</td>;
-                                })}
-                              </tr>
-                            </table>
-                            <div className='p-1' />
-                            <button
-                              className='p-1 bg-red-500 text-white rounded-sm'
-                              {...getRemoveFileProps()}
-                            >
-                              Remove
-                            </button>
-                          </div>
+                          <CsvTable
+                            properties={csvProperties}
+                            values={csvValues}
+                            removeFile={getRemoveFileProps}
+                          />
                         )}
                       </div>
                       <div className='pt-2' />
