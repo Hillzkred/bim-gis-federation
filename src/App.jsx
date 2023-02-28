@@ -1,17 +1,12 @@
-import { useCallback, useEffect, useState } from 'react';
-import maplibregl from 'maplibre-gl';
-import { Map, Source, Layer, Popup } from 'react-map-gl';
-import { useCSVReader } from 'react-papaparse';
-import CsvTable from './components/CsvTable';
+import { useState } from 'react';
+import { Source, Layer, Popup } from 'react-map-gl';
+import MainMap from './components/MainMap';
+import Csv from './components/Csv';
 
 export default function App() {
   const [data, setData] = useState(null);
-  const [cursor, setCursor] = useState('auto');
   const [showPopup, setShowPopup] = useState(false);
   const [popUpCoordinate, setPopUpCoordinate] = useState({});
-  const [csvProperties, setCsvProperties] = useState([]);
-  const [csvValues, setCsvValues] = useState([]);
-  const { CSVReader } = useCSVReader();
 
   const handleGeojsonUpload = (e) => {
     const file = e.target.files[0];
@@ -51,23 +46,7 @@ export default function App() {
   return (
     <div className='absolute top-0 left-0 h-full w-full'>
       <input type='file' onChange={handleGeojsonUpload} />
-      <Map
-        initialViewState={{
-          longitude: -75.72,
-          latitude: 45.18,
-          zoom: 10,
-        }}
-        mapLib={maplibregl}
-        mapStyle='https://api.maptiler.com/maps/basic/style.json?key=get_your_own_OpIi9ZULNHzrESv6T2vL'
-        onMouseEnter={() => {
-          setCursor('pointer');
-          console.log('Hovered');
-        }}
-        onMouseLeave={() => setCursor('auto')}
-        interactiveLayerIds={['buildings']}
-        cursor={cursor}
-        onClick={handleClick}
-      >
+      <MainMap handleClick={handleClick}>
         <Source type='geojson' data={data}>
           <Layer {...buildingStyle} />
         </Source>
@@ -75,49 +54,12 @@ export default function App() {
           <Popup {...popUpAttributes}>
             {
               <div>
-                <CSVReader
-                  onUploadAccepted={(results) => {
-                    setCsvProperties(results.data[0]);
-                    setCsvValues(results.data[1]);
-                  }}
-                >
-                  {({
-                    getRootProps,
-                    acceptedFile,
-                    ProgressBar,
-                    getRemoveFileProps,
-                  }) => (
-                    <>
-                      <div className='w-full'>
-                        <label
-                          className='cursor-pointer bg-teal-500 p-2 rounded-md text-white hover:bg-teal-700 w-full text-center'
-                          htmlFor='inputTag'
-                        >
-                          Upload a csv
-                          <input
-                            {...getRootProps()}
-                            className='hidden'
-                            id='inputTag'
-                          />
-                        </label>
-                        {acceptedFile && (
-                          <CsvTable
-                            properties={csvProperties}
-                            values={csvValues}
-                            removeFile={getRemoveFileProps}
-                          />
-                        )}
-                      </div>
-                      <div className='pt-2' />
-                      <ProgressBar />
-                    </>
-                  )}
-                </CSVReader>
+                <Csv />
               </div>
             }
           </Popup>
         )}
-      </Map>
+      </MainMap>
     </div>
   );
 }
