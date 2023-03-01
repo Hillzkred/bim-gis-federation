@@ -62,7 +62,7 @@ export default function App() {
     paint: {
       "fill-extrusion-color": "#8a8a8a",
       "fill-extrusion-opacity": 0.9,
-      "fill-extrusion-height": ["get", "POPULATION"],
+      "fill-extrusion-height": ["get", "Height"],
     },
   };
 
