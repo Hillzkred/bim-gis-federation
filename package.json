@@ -14,6 +14,8 @@
     "@danmarshall/deckgl-typings": "^4.9.27",
     "@loaders.gl/core": "^3.3.1",
     "@loaders.gl/gltf": "^3.3.1",
+    "@loaders.gl/i3s": "^3.3.1",
+    "@loaders.gl/obj": "^3.3.1",
     "@luma.gl/engine": "^8.5.18",
     "@luma.gl/experimental": "^8.5.18",
     "@luma.gl/webgl": "^8.5.18",
@@ -28,8 +30,7 @@
     "react-map-gl": "^7.0.21",
     "react-papaparse": "^4.1.0",
     "three": "^0.150.1",
-    "web-ifc-three": "^0.0.122",
-    "web-ifc-viewer": "^1.0.213"
+    "web-ifc-three": "^0.0.122"
   },
   "devDependencies": {
     "@types/node": "^18.14.2",

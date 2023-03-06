@@ -3,12 +3,15 @@ import DeckGL from '@deck.gl/react';
 import { ScenegraphLayer } from '@deck.gl/mesh-layers';
 import { forwardRef, useState } from 'react';
 import { Map } from 'react-map-gl';
-import { parse } from '@loaders.gl/core';
-import { GLTFLoader } from '@loaders.gl/gltf';
+import { parse, fetchFile } from '@loaders.gl/core';
+import { I3SLoader } from '@loaders.gl/i3s';
+// import { Tile3DLayer } from 'deck.gl';
+import { OBJLoader } from '@loaders.gl/obj';
 
 const MapContainer = forwardRef(({ children, handleClick, ifc }, ref) => {
   const [cursor, setCursor] = useState('auto');
   console.log(ifc);
+
   const layer = new ScenegraphLayer({
     id: 'scenegraph-layer',
     pickable: true,
@@ -20,12 +23,21 @@ const MapContainer = forwardRef(({ children, handleClick, ifc }, ref) => {
         coordinates: [148.9819, -35.39847],
       },
     ],
-    scenegraph: parse(ifc, GLTFLoader),
+    scenegraph: parse(fetchFile(ifc), I3SLoader),
+    // scenegraph:
+    //   'https://maplibre.org/maplibre-gl-js-docs/assets/34M_17/34M_17.gltf',
     getPosition: (d) => d.coordinates,
     getOrientation: (d) => [0, Math.random() * 180, 90],
-    sizeScale: 1,
+    sizeScale: 50000,
     _lighting: 'pbr',
   });
+
+  // const newLayer = new Tile3DLayer({
+  //   id: 'tile-3d-layer',
+  //   // Tileset entry point: Indexed 3D layer file url
+  //   data: 'https://tiles.arcgis.com/tiles/z2tnIkrLQ2BRzr6P/arcgis/rest/services/SanFrancisco_Bldgs/SceneServer/layers/0',
+  //   loader: I3SLoader,
+  // });
 
   return (
     <DeckGL

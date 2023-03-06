@@ -4,76 +4,34 @@ import MapContainer from './components/MapContainer';
 import Csv from './components/Csv';
 import centroid from '@turf/centroid';
 import { polygon } from '@turf/helpers';
-import { IfcViewerAPI } from 'web-ifc-viewer';
-// import { parse } from '@loaders.gl/core';
-// import { GLTFLoader } from '@loaders.gl/gltf';
-// import {
-//   IFCWALL,
-//   IFCWALLSTANDARDCASE,
-//   IFCSLAB,
-//   IFCWINDOW,
-//   IFCMEMBER,
-//   IFCPLATE,
-//   IFCCURTAINWALL,
-//   IFCDOOR,
-// } from 'web-ifc';
+import { IFCLoader } from 'web-ifc-three';
 
 export default function App() {
   const [data, setData] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
   const [popUpCoordinate, setPopUpCoordinate] = useState({});
   const [ifcData, setIfcData] = useState(false);
-  const [viewer, setViewer] = useState(false);
   const mapRef = useRef();
   const ifcRef = createRef();
 
   useEffect(() => {
     const container = ifcRef.current;
-    const viewer = new IfcViewerAPI({
-      container,
-    });
-    viewer.IFC.loader.ifcManager.applyWebIfcConfig({
-      COORDINATE_TO_ORIGIN: true,
-      USE_FAST_BOOLS: false,
-    });
-    setViewer(viewer);
   }, []);
+
+  const ifcLoader = new IFCLoader();
 
   const handleIfcUpload = async (e) => {
     const file = e.target.files[0];
-
+    console.log(file);
+    // const reader = new FileReader();
+    // reader.readAsArrayBuffer(file);
+    // reader.onload = (event) => {
+    //   setIfcData(event.currentTarget.result);
+    // };
     const url = URL.createObjectURL(file);
-    console.log(url);
-    const result = await viewer.GLTF.exportIfcFileAsGltf({
-      ifcFileUrl: url,
+    await ifcLoader.loadAsync(url).then((ifcModel) => {
+      setIfcData(ifcModel);
     });
-    const ifcReader = new FileReader();
-    ifcReader.readAsText(file);
-    ifcReader.onload = (event) => {
-      const arrayBuffer = event.currentTarget.result.byteLength;
-      setIfcData(event);
-    };
-    // const readPromise = new Promise((resolve) => {
-    //   const reader = new FileReader();
-    //   reader.onload = (ev) => {
-    //     console.log('foo');
-    //   };
-    //   reader.readAsArrayBuffer(e.dataTransfer.files[0]);
-    // });
-
-    // const gltf = parse(ifcReader.result, GLTFLoader).then((model) =>
-    //   console.log(model)
-    // );
-
-    const model = await viewer.IFC.loadIfc(file);
-    // const arrayBuffer = model.geometry.boundsTree._roots;
-
-    // parse(result, GLTFLoader).then((response) => {
-    //   console.log(result);
-    // });
-    // console.log(result);
-    // setIfcData(viewer);
-    viewer.shadowDropper.renderShadow(model.modelID);
   };
 
   const handleGeojsonUpload = (e) => {
@@ -144,19 +102,17 @@ export default function App() {
           <input className='hidden' type='file' onChange={handleIfcUpload} />
         </label>
       </nav>
-      {viewer && (
-        <MapContainer handleClick={handleClick} ref={mapRef} ifc={ifcData}>
-          <Source type='geojson' data={data}>
-            <Layer {...buildingStyle} />
-            <Layer {...buildingHeight} />
-          </Source>
-          {showPopup && (
-            <Popup {...popUpAttributes}>
-              <Csv />
-            </Popup>
-          )}
-        </MapContainer>
-      )}
+      <MapContainer handleClick={handleClick} ref={mapRef} ifc={ifcData}>
+        <Source type='geojson' data={data}>
+          <Layer {...buildingStyle} />
+          <Layer {...buildingHeight} />
+        </Source>
+        {showPopup && (
+          <Popup {...popUpAttributes}>
+            <Csv />
+          </Popup>
+        )}
+      </MapContainer>
     </div>
   );
 }
