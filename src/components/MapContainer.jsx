@@ -3,10 +3,12 @@ import DeckGL from '@deck.gl/react';
 import { ScenegraphLayer } from '@deck.gl/mesh-layers';
 import { forwardRef, useState } from 'react';
 import { Map } from 'react-map-gl';
+import { parse } from '@loaders.gl/core';
+import { GLTFLoader } from '@loaders.gl/gltf';
 
-const MainMap = forwardRef(({ children, handleClick }, ref) => {
+const MapContainer = forwardRef(({ children, handleClick, ifc }, ref) => {
   const [cursor, setCursor] = useState('auto');
-
+  console.log(ifc);
   const layer = new ScenegraphLayer({
     id: 'scenegraph-layer',
     pickable: true,
@@ -18,8 +20,7 @@ const MainMap = forwardRef(({ children, handleClick }, ref) => {
         coordinates: [148.9819, -35.39847],
       },
     ],
-    scenegraph:
-      'https://maplibre.org/maplibre-gl-js-docs/assets/34M_17/34M_17.gltf',
+    scenegraph: parse(ifc, GLTFLoader),
     getPosition: (d) => d.coordinates,
     getOrientation: (d) => [0, Math.random() * 180, 90],
     sizeScale: 1,
@@ -55,4 +56,4 @@ const MainMap = forwardRef(({ children, handleClick }, ref) => {
     </DeckGL>
   );
 });
-export default MainMap;
+export default MapContainer;
