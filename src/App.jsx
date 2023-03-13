@@ -5,33 +5,67 @@ import Csv from './components/Csv';
 import centroid from '@turf/centroid';
 import { polygon } from '@turf/helpers';
 import { IFCLoader } from 'web-ifc-three';
+import { IfcContext } from 'web-ifc-viewer/dist/components';
+import { IfcManager } from 'web-ifc-viewer/dist/components/ifc';
 
 export default function App() {
   const [data, setData] = useState(null);
+  const [container, setContainer] = useState();
   const [showPopup, setShowPopup] = useState(false);
   const [popUpCoordinate, setPopUpCoordinate] = useState({});
   const [ifcData, setIfcData] = useState(false);
+  const [model, setModel] = useState(false);
   const mapRef = useRef();
   const ifcRef = createRef();
 
   useEffect(() => {
-    const container = ifcRef.current;
+    const mapContainer = ifcRef.current;
+    setContainer(mapContainer);
   }, []);
 
   const ifcLoader = new IFCLoader();
 
   const handleIfcUpload = async (e) => {
     const file = e.target.files[0];
-    console.log(file);
+    const url = URL.createObjectURL(file);
+
     // const reader = new FileReader();
+    // reader.readAsArrayBuffer(file);
+    // reader.onload = (event) => {
+    //   const ifcAsText = event.currentTarget.result;
+    //   console.log(ifcAsText);
+    //   setModel(ifcAsText);
+    // };
+    const ifcManager = new IfcManager(
+      new IfcContext({
+        container: container,
+      })
+    );
+    // ifcLoader.load(url, (x) => setModel(x));
+    await ifcManager.setWasmPath('../');
+    const foo = await ifcManager.loadIfc(file, true, () => null);
+    setIfcData(foo);
+
+    // ifcLoader.load(url, (x) => {
+    // });
+    // const createIfc = await ifcLoader.loadAsync(file);
+    // console.log(createIfc);
+    // const ifcManager = new IfcManager(
+    //   new IfcContext({
+    //     container: container,
+    //   })
+    // );
+    // const model = await ifcManager.loadIfc(createIfc, true, () => null);
+    // setIfcData(model);
+    // console.log(model);
+
     // reader.readAsArrayBuffer(file);
     // reader.onload = (event) => {
     //   setIfcData(event.currentTarget.result);
     // };
-    const url = URL.createObjectURL(file);
-    await ifcLoader.loadAsync(url).then((ifcModel) => {
-      setIfcData(ifcModel);
-    });
+    // await ifcLoader.loadAsync(url).then((ifcModel) => {
+    //   setIfcData(ifcModel);
+    // });
   };
 
   const handleGeojsonUpload = (e) => {
@@ -65,6 +99,12 @@ export default function App() {
   const popUpAttributes = {
     longitude: popUpCoordinate.lng,
     latitude: popUpCoordinate.lat,
+  };
+
+  const ifcModel = {
+    id: 'ifc-model',
+    type: 'custom',
+    data: ifcData,
   };
 
   const buildingStyle = {
@@ -102,7 +142,7 @@ export default function App() {
           <input className='hidden' type='file' onChange={handleIfcUpload} />
         </label>
       </nav>
-      <MapContainer handleClick={handleClick} ref={mapRef} ifc={ifcData}>
+      <MapContainer handleClick={handleClick} ref={ifcRef} ifc={ifcData}>
         <Source type='geojson' data={data}>
           <Layer {...buildingStyle} />
           <Layer {...buildingHeight} />
